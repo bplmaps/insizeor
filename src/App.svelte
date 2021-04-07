@@ -88,6 +88,19 @@
     letter-spacing: 3px;
   }
 
+  .column-bumper {
+    border: 3px inset rgba(157, 100, 167, 0.27);
+    background-color: rgba(255,255,255,0.4);
+  }
+
+  .column-bumper-a {
+    box-shadow: -3px -3px 0 rgba(255, 188, 81, 0.5);
+  }
+
+  .column-bumper-b {
+    box-shadow: -3px -3px 0 rgba(235, 154, 101, 0.5);
+  }
+
   .preview-image {
     max-width: 100%;
     max-height: 500px;
@@ -114,14 +127,16 @@
   <section id="splash">
     <div class="container">
     <h1 class="title">Insizeor</h1>
-    <p>How big is a cargo ship compared to Boston Common? What would the White House look like in Glacier National Park? Use this tool to drop an image to scale on top of an aerial map.</p>
-    
+    <div class="is-size-5 mb-4">
+    <p>How big is a cargo ship compared to Boston Common? What would the White House look like in Glacier National Park?</p>
+    <p class="has-text-weight-bold">Use this tool to drop any image to scale on top of an aerial map.</p>
+  </div>
     
 
     <div class="has-text-centered py-5">
 
-      <div class="columns is-vcentered">
-        <div class="column is-one-third">Enter the URL to any image</div>
+      <div class="columns is-vcentered column-bumper column-bumper-a">
+        <div class="column is-one-third is-size-4">Enter the URL to any image</div>
         <div class="column">
           <div class="field has-addons">
           <div class="control is-expanded">
@@ -132,11 +147,14 @@
               Load image
             </button>
           </div>
-        </div></div>
+         
+        </div>
+        <p class="is-size-7">🤷 Need somewhere to upload an image? Try <a href="https://imgur.com">Imgur</a> or <a href="https://postimages.org">Postimage</a>.</p>
+      </div>
       </div>
 
-      <div class="columns">
-        <div class="column is-one-third">Or choose an example from our gallery</div>
+      <div class="columns is-vcentered column-bumper column-bumper-b mt-3">
+        <div class="column is-one-third is-size-4">Or choose an example from our gallery</div>
         <div class="column">
             {#each examples as example}
               <button class="button is-primary has-text-weight-bold mr-5" on:click={()=>{enterMap(example.image, example.width)}}>{example.label}</button>
