@@ -1,69 +1,195 @@
 <script>
-  import {onMount} from 'svelte';
-  let count = 0;
-  onMount(() => {
-    const interval = setInterval(() => count++, 1000);
-    return () => {
-      clearInterval(interval);
-    };
-  });
+  import './bulma-imports.scss';
+
+  import MapView from './MapView.svelte';
+
+  let view = "splash";
+  let inputImage;
+  let loadedImageSrc;
+
+  let mapVars = {};
+
+  let measurementUnit = "meters";
+  let inputWidthDimension;
+
+  let examples = [
+    {label: "Evergiven Ship", image: "https://cdn.glitch.com/40d83f73-34cc-401e-90f3-d6b2f92f2b01%2Fevergiven.png?v=1616949352560", width: 400},
+    {label: "BPL McKim Building", image: "https://s3.us-east-2.wasabisys.com/cartinal/mckim.png", width: 72}
+  ];
+
+  function checkImageUrl() {
+    if(!inputImage || inputImage.length < 7 || inputImage.slice(0,8) != "https://") {
+      window.alert("The image URL must begin with https:// ");
+    }
+    else {
+      fetch(inputImage)
+        .then(response => {
+          if(response.status === 200) {
+            loadedImageSrc = inputImage;
+            view = "loadImageInterstitial";
+          } else {
+            window.alert("Something seems wrong with that URL. Try entering it again.")
+          }
+        })
+        .catch(()=>{ window.alert("Something seems wrong with that URL. The server may not allow images to be shared to other sites."); });
+    }
+  }
+
+  function startOver() {
+    inputImage = "";
+    loadedImageSrc = null;
+    view = "splash";
+  }
+
+  function finishLoadingImage() {
+    if(isNaN(inputWidthDimension)){
+      window.alert("The size must be a number");
+    }
+    else {
+      let w = measurementUnit === "feet" ? inputWidthDimension * 0.3048 : inputWidthDimension;
+      enterMap(loadedImageSrc, w);
+    }
+  }
+
+  function enterMap(img,width) {
+    mapVars.overlayImage = img;
+    mapVars.imageWidth = width;
+    view = "main";
+  }
+
 </script>
 
 <style>
+  @import url("https://use.typekit.net/ros1unq.css");
+  
+  :global(html) {
+    height: 100%;
+  }
+
   :global(body) {
     margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: azo-sans-web, Helvetica, sans-serif;
+    background: rgb(255,255,240);
+    background: linear-gradient(135deg, rgba(255,255,240,1) 0%, rgba(230,251,255,1) 100%);
+    min-height: 100%;
   }
-  .App {
+  .wraps-all {
     text-align: center;
-  }
-  .App code {
-    background: #0002;
-    padding: 4px 8px;
-    border-radius: 4px;
-  }
-  .App p {
-    margin: 0.4rem;
+    padding: 2rem;
   }
 
-  .App-header {
-    background-color: #f9f6f6;
-    color: #333;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
+  h1.title {
+    text-transform: uppercase;
+    color: #373fff;
+    text-shadow: 2px 2px 0px coral;
+    font-size: 2.5rem;
+    font-family: azo-sans-uber;
+    font-weight: 400;
+    letter-spacing: 3px;
   }
-  .App-link {
-    color: #ff3e00;
+
+  .preview-image {
+    max-width: 100%;
+    max-height: 500px;
   }
-  .App-logo {
-    height: 36vmin;
-    pointer-events: none;
-    margin-bottom: 3rem;
-    animation: App-logo-pulse infinite 1.6s ease-in-out alternate;
+
+  .footer-logo {
+    width: 200px;
+    height: auto;
   }
-  @keyframes App-logo-pulse {
-    from {
-      transform: scale(1);
-    }
-    to {
-      transform: scale(1.06);
-    }
-  }
+  
 </style>
 
-<div class="App">
-  <header class="App-header">
-    <img src="/logo.svg" class="App-logo" alt="logo" />
-    <p>Edit <code>src/App.svelte</code> and save to reload.</p>
-    <p>Page has been open for <code>{count}</code> seconds.</p>
-    <p>
-      <a class="App-link" href="https://svelte.dev" target="_blank" rel="noopener noreferrer">
-        Learn Svelte
-      </a>
-    </p>
-  </header>
+<svelte:head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+    crossorigin=""/>
+</svelte:head>
+
+
+<div class="wraps-all">
+
+
+  {#if view === "splash" }
+  <section id="splash">
+    <div class="container">
+    <h1 class="title">Insizeor</h1>
+    <p>How big is a cargo ship compared to Boston Common? What would the White House look like in Glacier National Park? Use this tool to drop an image to scale on top of an aerial map.</p>
+    
+    
+
+    <div class="has-text-centered py-5">
+
+      <div class="columns is-vcentered">
+        <div class="column is-one-third">Enter the URL to any image</div>
+        <div class="column">
+          <div class="field has-addons">
+          <div class="control is-expanded">
+            <input bind:value={inputImage} class="input" type="text" placeholder="https://.../image.png" aria-label="Field to enter an image URL">
+          </div>
+          <div class="control">
+            <button class="button is-primary has-text-weight-bold" on:click="{checkImageUrl}">
+              Load image
+            </button>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="columns">
+        <div class="column is-one-third">Or choose an example from our gallery</div>
+        <div class="column">
+            {#each examples as example}
+              <button class="button is-primary has-text-weight-bold mr-5" on:click={()=>{enterMap(example.image, example.width)}}>{example.label}</button>
+            {/each}
+        </div>
+      </div>
+
+   
+    </div>
+
+    </div>
+
+    <footer>
+      <img src="https://s3.us-east-2.wasabisys.com/cartinal/MapCenter-small.png" alt="LMEC Logo" class="footer-logo">
+    </footer>
+      
+  </section>
+
+  {:else if view==="loadImageInterstitial"}
+
+  <section id="imageInterstitial">
+    <div class="container">
+      <p>OK, here's the image we'll be using. If it doesn't look right to you, you should <button class="button is-primary is-small has-text-weight-bold is-outlined" on:click="{startOver}">Start Over</button></p>
+      <div class="preview-image-holder box my-4">
+        <img class="preview-image" src={loadedImageSrc} alt="The image that you loaded">
+      </div>
+      <p>To scale it, we need to know how big it is in the real world <strong>from the left side of the image to the right</strong>.</p>
+      <div class="field has-addons has-addons-centered py-2">
+        <p class="control">
+          <input class="input" type="text" bind:value={inputWidthDimension} placeholder="Real size of this image">
+        </p>
+        <p class="control">
+          <span class="select">
+            <select bind:value="{measurementUnit}">
+              <option value="meters">meters</option>
+              <option value="feet">feet</option>
+            </select>
+          </span>
+        </p>
+        <p class="control">
+          <button class="button is-primary has-text-weight-bold" on:click="{finishLoadingImage}">
+            Enter
+          </button>
+        </p>
+      </div>
+    </div>
+  </section>
+  
+
+  {:else if view==="main" }
+  <section id="main">
+    <MapView bind:mapVars={mapVars} on:startOver={startOver} />
+  </section>
+  {/if}
+
 </div>

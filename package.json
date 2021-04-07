@@ -5,6 +5,10 @@
     "test": "web-test-runner \"src/**/*.test.js\""
   },
   "dependencies": {
+    "@snowpack/plugin-sass": "^1.4.0",
+    "autocompleter": "^6.1.0",
+    "bulma": "^0.9.2",
+    "leaflet": "^1.7.1",
     "svelte": "^3.24.0"
   },
   "devDependencies": {
