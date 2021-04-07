@@ -6,7 +6,7 @@ export let mapVars = {
 }
 
 import {onMount} from "svelte";
-import L from "Leaflet";
+import L from "leaflet";
 import autocomplete from "autocompleter";
 import 'autocompleter/autocomplete.css'
 
