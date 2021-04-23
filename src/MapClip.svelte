@@ -22,6 +22,11 @@ import {
     Style
 } from 'ol/style';
 
+import {toLonLat} from 'ol/proj';
+
+
+import distance from "@turf/distance";
+
 import 'ol/ol.css';
 
 
@@ -80,8 +85,16 @@ function addInteraction() {
                 // document.body.appendChild(em);
                 // em.src = ig;
                 drawn = true;
-                var ext = map.getView().calculateExtent();
-                complete(ig, ext[3]-ext[1])
+                let ext = map.getView().calculateExtent();
+
+                let y = (ext[1]+ext[3])/2;
+                let left = toLonLat([ext[0],y]);
+
+                let right = toLonLat([ext[2],y]);
+
+                let w = distance(left, right)*1000;
+                complete(ig, w);
+
             }
 
         })
