@@ -1,7 +1,9 @@
 <script>
   import './bulma-imports.scss';
 
+
   import MapView from './MapView.svelte';
+  import MapClip from './MapClip.svelte';
 
   let view = "splash";
   let inputImage;
@@ -129,7 +131,7 @@
     <h1 class="title">Insizeor</h1>
     <div class="is-size-5 mb-4">
     <p>How big is a cargo ship compared to Boston Common? What would the White House look like in Glacier National Park?</p>
-    <p class="has-text-weight-bold">Use this tool to drop any image to scale on top of an aerial map.</p>
+    <p class="has-text-weight-bold">Use this tool to drop any image to scale on top of an aerial map. There are three ways to get started:</p>
   </div>
     
 
@@ -154,11 +156,18 @@
       </div>
 
       <div class="columns is-vcentered column-bumper column-bumper-b mt-3">
-        <div class="column is-one-third is-size-4">Or choose an example from our gallery</div>
+        <div class="column is-one-third is-size-4">Choose an example from our gallery</div>
         <div class="column">
             {#each examples as example}
               <button class="button is-primary has-text-weight-bold mr-5" on:click={()=>{enterMap(example.image, example.width)}}>{example.label}</button>
             {/each}
+        </div>
+      </div>
+
+      <div class="columns is-vcentered column-bumper column-bumper-b mt-3">
+        <div class="column is-one-third is-size-4">Draw a shape on the map to clip out</div>
+        <div class="column">
+            <MapClip on:mapClipped={(event)=>{ enterMap(event.detail.imgSrc, event.detail.size) }}></MapClip>
         </div>
       </div>
 
@@ -168,6 +177,9 @@
     </div>
 
     <footer>
+      <p class="mb-2">
+        <a class="button is-small is-link is-outlined" href="https://leventhalmap.org/donate">💌 Support free programs at LMEC</a>
+      </p>
       <img src="https://s3.us-east-2.wasabisys.com/cartinal/MapCenter-small.png" alt="LMEC Logo" class="footer-logo">
     </footer>
       
@@ -209,5 +221,8 @@
     <MapView bind:mapVars={mapVars} on:startOver={startOver} />
   </section>
   {/if}
+
+
+
 
 </div>

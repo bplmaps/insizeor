@@ -25,6 +25,103 @@ function warpImage() {
     document.getElementById('image-overlay').style.transform = `translate(-50%,-50%) scale(${scale}) rotate(${rotation}deg)`;
 }
 
+function zoomCalculator(w) {
+   let cutpoints = [
+ {
+   "zoom": 20,
+   "width": 74.5
+ },
+ {
+   "zoom": 19,
+   "width": 149
+ },
+ {
+   "zoom": 18,
+   "width": 298
+ },
+ {
+   "zoom": 17,
+   "width": 596.5
+ },
+ {
+   "zoom": 16,
+   "width": 1193.5
+ },
+ {
+   "zoom": 15,
+   "width": 2386.5
+ },
+ {
+   "zoom": 14,
+   "width": 4773.5
+ },
+ {
+   "zoom": 13,
+   "width": 9546.5
+ },
+ {
+   "zoom": 12,
+   "width": 19093.5
+ },
+ {
+   "zoom": 11,
+   "width": 38186.5
+ },
+ {
+   "zoom": 10,
+   "width": 76373
+ },
+ {
+   "zoom": 9,
+   "width": 152746
+ },
+ {
+   "zoom": 8,
+   "width": 305492
+ },
+ {
+   "zoom": 7,
+   "width": 611000
+ },
+ {
+   "zoom": 6,
+   "width": 1222000
+ },
+ {
+   "zoom": 5,
+   "width": 2444000
+ },
+ {
+   "zoom": 4,
+   "width": 4888000
+ },
+ {
+   "zoom": 3,
+   "width": 9775500
+ },
+ {
+   "zoom": 2,
+   "width": 19551500
+ },
+ {
+   "zoom": 1,
+   "width": 39103000
+ },
+ {
+   "zoom": 0,
+   "width": 78206000
+ }
+
+]
+
+for (let index = 0; index < cutpoints.length; index++) {
+    if(cutpoints[index].width > w) {
+        return cutpoints[index].zoom;
+    }    
+}
+
+}
+
 onMount(()=>{
 
     autocomplete({
@@ -36,13 +133,15 @@ onMount(()=>{
         },
         debounceWaitMs: 300,
         onSelect: function(item) {
-            console.log(map.setView(item.latlng, 17));
+            console.log(map.setView(item.latlng, zoomCalculator(mapVars.imageWidth)));
         }
         });
 
+
+
     let map = L.map("map-inner-container", {
        center: [42.356613, -71.084876],
-        zoom: 17
+        zoom: zoomCalculator(mapVars.imageWidth)
     });
 
     function warpScale() {
