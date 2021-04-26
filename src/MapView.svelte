@@ -51,6 +51,7 @@ let mapId = "map-inner-container";
 var map;
 
 function zoomCalculator(w) {
+    console.log(w)
     let cutpoints = [{
             "zoom": 19,
             "width": 149
@@ -134,12 +135,8 @@ function zoomCalculator(w) {
 
     ]
 
-    for (let index = 0; index < cutpoints.length; index++) {
-        if (cutpoints[index].width > w+200) {
-            return cutpoints[index].zoom;
-        }
-    }
-
+    const f = cutpoints.find(x => x.width > w+200);
+    return f.zoom;
 }
 
 onMount(() => {
@@ -193,13 +190,10 @@ onMount(() => {
         let ll = toLonLat(v.getCenter());
         let z = v.getZoom();
 
-        console.log(z);
-
         let metersPerPx =
             (156543.03392 * Math.cos((ll[1] * Math.PI) / 180)) /
             Math.pow(2, z);
         scale = 1 / metersPerPx * (mapVars.imageWidth / 400);
-        console.log(metersPerPx);
         warpImage();
     }
 

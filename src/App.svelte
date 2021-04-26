@@ -50,7 +50,7 @@
     }
     else {
       let w = measurementUnit === "feet" ? inputWidthDimension * 0.3048 : inputWidthDimension;
-      enterMap(loadedImageSrc, w);
+      enterMap(loadedImageSrc, +w);
     }
   }
 
