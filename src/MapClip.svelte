@@ -1,6 +1,7 @@
 <script>
-
-import { createEventDispatcher } from 'svelte';
+import {
+    createEventDispatcher
+} from 'svelte';
 
 import Draw from 'ol/interaction/Draw';
 import Map from 'ol/Map';
@@ -22,22 +23,35 @@ import {
     Style
 } from 'ol/style';
 
-import {toLonLat} from 'ol/proj';
+import {
+    toLonLat,
+    fromLonLat
+} from 'ol/proj';
 
+import {
+    onMount
+} from 'svelte';
+
+import autocomplete from "autocompleter";
+import 'autocompleter/autocomplete.css'
 
 import distance from "@turf/distance";
 
 import 'ol/ol.css';
 
-
 const dispatch = createEventDispatcher();
 
-function complete(imgSrc, size){ dispatch('mapClipped', {imgSrc: imgSrc, size: size}); }
+function complete(imgSrc, size) {
+    dispatch('mapClipped', {
+        imgSrc: imgSrc,
+        size: size
+    });
+}
 
 let mapId = 'mapDiv';
 let map;
 
-let drawingButtonText = "Start Drawing";
+let drawingButtonText = "✏️ Click to start drawing";
 
 var raster = new TileLayer({
     source: new XYZ({
@@ -66,43 +80,21 @@ var style = new Style({
 });
 
 let drawn = false;
+let drawing = false;
 
 var draw; // global so we can remove it later
 function addInteraction() {
-    draw = new Draw({
-        source: source,
-        type: "Polygon",
-    });
-    source.on("addfeature", function() {
-        // console.log(source.getFeatures())
 
-        map.getView().fit(source.getExtent())
-        map.on('rendercomplete', () => {
-            if (!drawn) {
-                let cv = document.querySelector("canvas");
-                let ig = cv.toDataURL("image/png");
-                // let em = document.createElement("img")
-                // document.body.appendChild(em);
-                // em.src = ig;
-                drawn = true;
-                let ext = map.getView().calculateExtent();
-
-                let y = (ext[1]+ext[3])/2;
-                let left = toLonLat([ext[0],y]);
-
-                let right = toLonLat([ext[2],y]);
-
-                let w = distance(left, right)*1000;
-                complete(ig, w);
-
-            }
-
-        })
-
-    });
-    drawingButtonText = "Click on corners, double click to close";
-    map.addInteraction(draw);
-
+    if (drawing) {
+        drawing = false;
+        drawingButtonText = "✏️ Click to start drawing";
+        map.removeInteraction(draw);
+        source.clear();
+    } else {
+        drawingButtonText = "🤚 Undo and start over";
+        drawing = true;
+        map.addInteraction(draw);
+    }
 }
 
 function initializeMap(node, _id) {
@@ -128,30 +120,105 @@ function initializeMap(node, _id) {
 
             });
 
+            source.on("addfeature", function() {
+
+                map.getView().fit(source.getExtent())
+                map.on('rendercomplete', () => {
+                    if (!drawn) {
+                        let cv = document.querySelector("canvas");
+                        let ig = cv.toDataURL("image/png");
+
+                        drawn = true;
+                        let ext = map.getView().calculateExtent();
+
+                        let y = (ext[1] + ext[3]) / 2;
+                        let left = toLonLat([ext[0], y]);
+
+                        let right = toLonLat([ext[2], y]);
+
+                        let w = distance(left, right) * 1000;
+                        complete(ig, w);
+
+                    }
+
+                })
+
+            });
+
+            draw = new Draw({
+                source: source,
+                type: "Polygon",
+            });
+
         } else {
             console.log("waiting for sized box");
         }
     }, 100);
 }
+
+onMount(() => {
+    autocomplete({
+        input: document.getElementById('nominatim-autocomplete'),
+        "fetch": function(text, callback) {
+            fetch(`https://nominatim.openstreetmap.org/?&q=${text}&format=json&limit=5`)
+                .then(response => response.json())
+                .then(j => {
+                    callback(j.map(x => {
+                        return {
+                            label: x.display_name,
+                            latlng: [+x.lat, +x.lon]
+                        }
+                    }));
+                })
+        },
+        debounceWaitMs: 300,
+        onSelect: function(item) {
+            let ll = item.latlng.reverse();
+            map.getView().setCenter(fromLonLat(ll));
+        }
+    });
+});
 </script>
 
 <style>
 #map-clip {
     width: 100%;
+    background-color: rgba(246, 253, 214, 0.5);
+    border: 2px solid rgb(213, 218, 190);
+    padding: 10px;
 }
 
 .ol-map-clip-holder {
     height: 500px;
     width: 100%;
     background-color: #333;
+    position: relative;
+}
+
+#drawing-button {
+    position: absolute;
+    z-index: 9999;
+    top: 5px;
+    right: 5px;
+}
+
+#drawing-instructions {
+    position: absolute;
+    bottom: 3px;
+    z-index: 9999;
+    right: 5px;
 }
 </style>
 
 <div id="map-clip">
 
-    <div class="ol-map-clip-holder" id={mapId} use:initializeMap={mapId}>
+    <div class="pb-2">
+        <input type="text" class="input mb-2" id="nominatim-autocomplete" placeholder="Jump to location ...">
     </div>
 
-    <button class="button is-outlined mt-3" on:click="{addInteraction}" disabled="{drawingButtonText === 'Click on corners, double click to close'}">{drawingButtonText}</button>
+    <div class="ol-map-clip-holder" id={mapId} use:initializeMap={mapId}>
+        <button class="button is-danger" id="drawing-button" on:click="{addInteraction}">{drawingButtonText}</button>
+        {#if drawing}<div class="tag is-warning is-small" id="drawing-instructions">Click on corners. Double click to finish.</div>{/if}
+    </div>
 
 </div>

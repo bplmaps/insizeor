@@ -16,7 +16,8 @@
 
   let examples = [
     {label: "Evergiven Ship", image: "https://cdn.glitch.com/40d83f73-34cc-401e-90f3-d6b2f92f2b01%2Fevergiven.png?v=1616949352560", width: 400},
-    {label: "BPL McKim Building", image: "https://s3.us-east-2.wasabisys.com/cartinal/mckim.png", width: 72}
+    {label: "BPL McKim Building", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/mckim.png", width: 72},
+    {label: "Fenway Park", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/fenway.png", width: 235}
   ];
 
   function checkImageUrl() {
@@ -131,7 +132,7 @@
     <h1 class="title">Insizeor</h1>
     <div class="is-size-5 mb-4">
     <p>How big is a cargo ship compared to Boston Common? What would the White House look like in Glacier National Park?</p>
-    <p class="has-text-weight-bold">Use this tool to drop any image to scale on top of an aerial map. There are three ways to get started:</p>
+    <p class="notification is-success is-light my-2 has-text-weight-bold">Use this tool to drop any image to scale on top of an aerial map. There are three different ways to get started.</p>
   </div>
     
 
@@ -159,7 +160,7 @@
         <div class="column is-one-third is-size-4">Choose an example from our gallery</div>
         <div class="column">
             {#each examples as example}
-              <button class="button is-primary has-text-weight-bold mr-5" on:click={()=>{enterMap(example.image, example.width)}}>{example.label}</button>
+              <button class="button is-primary has-text-weight-bold mr-4 mb-1" on:click={()=>{enterMap(example.image, example.width)}}>{example.label}</button>
             {/each}
         </div>
       </div>
@@ -175,13 +176,6 @@
     </div>
 
     </div>
-
-    <footer>
-      <p class="mb-2">
-        <a class="button is-small is-link is-outlined" href="https://leventhalmap.org/donate">💌 Support free programs at LMEC</a>
-      </p>
-      <img src="https://s3.us-east-2.wasabisys.com/cartinal/MapCenter-small.png" alt="LMEC Logo" class="footer-logo">
-    </footer>
       
   </section>
 
@@ -218,9 +212,18 @@
 
   {:else if view==="main" }
   <section id="main">
+    <div class="notification is-success is-light">
+      <p class="has-text-weight-bold">Here's your image dropped down on top of Boston Common. Grab and move the map, or type in the search bar to move elsewhere. You can use the rotate buttons to adjust the positioning of the scaled image.</p></div>
     <MapView bind:mapVars={mapVars} on:startOver={startOver} />
   </section>
   {/if}
+
+  <footer>
+    <p class="mb-2">
+      <a class="button is-small is-link is-outlined" href="https://leventhalmap.org/donate">💌 Support free programs at LMEC</a>
+    </p>
+    <a href="https://leventhalmap.org"><img src="https://s3.us-east-2.wasabisys.com/cartinal/MapCenter-small.png" alt="LMEC Logo" class="footer-logo"></a>
+  </footer>
 
 
 
