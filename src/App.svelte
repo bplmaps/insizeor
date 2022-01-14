@@ -17,7 +17,9 @@
   let examples = [
     {label: "Evergiven Ship", image: "https://cdn.glitch.com/40d83f73-34cc-401e-90f3-d6b2f92f2b01%2Fevergiven.png?v=1616949352560", width: 400},
     {label: "BPL McKim Building", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/mckim.png", width: 72},
-    {label: "Fenway Park", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/fenway.png", width: 235}
+    {label: "Fenway Park", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/fenway.png", width: 235},
+    {label: "Rhode Island", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/ri.png", width: 60000}
+
   ];
 
   function checkImageUrl() {
@@ -49,7 +51,7 @@
       window.alert("The size must be a number");
     }
     else {
-      let w = measurementUnit === "feet" ? inputWidthDimension * 0.3048 : inputWidthDimension;
+      let w = measurementUnit === "feet" ? (inputWidthDimension * 0.3048) : inputWidthDimension;
       enterMap(loadedImageSrc, +w);
     }
   }
@@ -222,7 +224,8 @@
     <p class="mb-2">
       <a class="button is-small is-link is-outlined" href="https://leventhalmap.org/donate">💌 Support free programs at LMEC</a>
     </p>
-    <a href="https://leventhalmap.org"><img src="https://s3.us-east-2.wasabisys.com/cartinal/MapCenter-small.png" alt="LMEC Logo" class="footer-logo"></a>
+    <a href="https://leventhalmap.org"><img src="https://s3.us-east-2.wasabisys.com/lmec-public-files/images/MapCenter-small.png" alt="LMEC Logo" class="footer-logo"></a>
+    <p class="is-size-7"><a href="https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9">Map imagery source</a>: Esri, Maxar, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AeroGRID, IGN, and the GIS User Community</p>
   </footer>
 
 

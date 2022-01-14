@@ -180,6 +180,7 @@ onMount(() => {
         view: new View({
             center: [-7911042.34, 5214298.54],
             zoom: zoomCalculator(mapVars.imageWidth),
+            maxZoom: 19
         })
     });
 
@@ -202,7 +203,7 @@ onMount(() => {
 
 <style>
 #map-view {
-    height: 800px;
+    height: 900px;
     width: 100%;
     display: flex;
     flex-direction: column;

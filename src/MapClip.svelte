@@ -27,6 +27,7 @@ import {
     toLonLat,
     fromLonLat
 } from 'ol/proj';
+import {defaults} from 'ol/interaction';
 
 import {
     onMount
@@ -97,66 +98,59 @@ function addInteraction() {
     }
 }
 
-function initializeMap(node, _id) {
-    let w = setInterval(() => {
-        if (node.clientHeight > 0) {
-            clearTimeout(w);
-            map = new Map({
-                layers: [raster, vector],
-                target: mapId,
-                view: new View({
-                    center: [-7913132.21, 5213548.94],
-                    zoom: 15,
-                }),
-            });
-
-            raster.on('postrender', function(e) {
-                var vectorContext = getVectorContext(e);
-                e.context.globalCompositeOperation = 'destination-in';
-                vector.getSource().forEachFeature(function(feature) {
-                    vectorContext.drawFeature(feature, style);
-                });
-                e.context.globalCompositeOperation = 'source-over';
-
-            });
-
-            source.on("addfeature", function() {
-
-                map.getView().fit(source.getExtent())
-                map.on('rendercomplete', () => {
-                    if (!drawn) {
-                        let cv = document.querySelector("canvas");
-                        let ig = cv.toDataURL("image/png");
-
-                        drawn = true;
-                        let ext = map.getView().calculateExtent();
-
-                        let y = (ext[1] + ext[3]) / 2;
-                        let left = toLonLat([ext[0], y]);
-
-                        let right = toLonLat([ext[2], y]);
-
-                        let w = distance(left, right) * 1000;
-                        complete(ig, w);
-
-                    }
-
-                })
-
-            });
-
-            draw = new Draw({
-                source: source,
-                type: "Polygon",
-            });
-
-        } else {
-            console.log("waiting for sized box");
-        }
-    }, 100);
-}
-
 onMount(() => {
+
+    map = new Map({
+        layers: [raster, vector],
+        target: mapId,
+        view: new View({
+            center: [-7913132.21, 5213548.94],
+            zoom: 15,
+            maxZoom: 19
+        }),
+        interactions : defaults({doubleClickZoom :false}),
+    });
+
+    draw = new Draw({
+        source: source,
+        type: "Polygon",
+    });
+
+    raster.on('postrender', function(e) {
+        var vectorContext = getVectorContext(e);
+        e.context.globalCompositeOperation = 'destination-in';
+        vector.getSource().forEachFeature(function(feature) {
+            vectorContext.drawFeature(feature, style);
+        });
+        e.context.globalCompositeOperation = 'source-over';
+
+    });
+
+    source.on("addfeature", function() {
+        map.getView().fit(source.getExtent())
+        map.removeInteraction(draw);
+        map.on('rendercomplete', () => {
+            if (!drawn) {
+                let cv = document.querySelector("canvas");
+                let ig = cv.toDataURL("image/png");
+
+                drawn = true;
+                let ext = map.getView().calculateExtent();
+
+                let y = (ext[1] + ext[3]) / 2;
+                let left = toLonLat([ext[0], y]);
+
+                let right = toLonLat([ext[2], y]);
+
+                let w = distance(left, right) * 1000;
+                complete(ig, w);
+
+            }
+
+        })
+
+    });
+
     autocomplete({
         input: document.getElementById('nominatim-autocomplete'),
         "fetch": function(text, callback) {
@@ -188,11 +182,20 @@ onMount(() => {
     padding: 10px;
 }
 
-.ol-map-clip-holder {
+.ol-map-clip-outer-holder {
     height: 500px;
     width: 100%;
     background-color: #333;
     position: relative;
+}
+
+.ol-map-clip-inner-holder {
+    position: absolute;
+    height: 500px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
 
 #drawing-button {
@@ -216,7 +219,8 @@ onMount(() => {
         <input type="text" class="input mb-2" id="nominatim-autocomplete" placeholder="Jump to location ...">
     </div>
 
-    <div class="ol-map-clip-holder" id={mapId} use:initializeMap={mapId}>
+    <div class="ol-map-clip-outer-holder" id={mapId}>
+        <div id={mapId} class="ol-map-clip-inner-holder"></div>
         <button class="button is-danger" id="drawing-button" on:click="{addInteraction}">{drawingButtonText}</button>
         {#if drawing}<div class="tag is-warning is-small" id="drawing-instructions">Click on corners. Double click to finish.</div>{/if}
     </div>
