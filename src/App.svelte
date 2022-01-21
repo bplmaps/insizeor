@@ -18,7 +18,8 @@
     {label: "Evergiven Ship", image: "https://cdn.glitch.com/40d83f73-34cc-401e-90f3-d6b2f92f2b01%2Fevergiven.png?v=1616949352560", width: 400},
     {label: "BPL McKim Building", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/mckim.png", width: 72},
     {label: "Fenway Park", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/fenway.png", width: 235},
-    {label: "Rhode Island", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/ri.png", width: 60000}
+    {label: "Rhode Island", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/ri.png", width: 60000},
+    {label: "2022 Hunga Tonga eruption", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/tonga-eruption.png", width: 450000, credit: "<a href=\"https://twitter.com/WxNB_\">Nahel.B on Twitter</a>"}
 
   ];
 
@@ -56,9 +57,10 @@
     }
   }
 
-  function enterMap(img,width) {
+  function enterMap(img,width,credit) {
     mapVars.overlayImage = img;
     mapVars.imageWidth = width;
+    mapVars.credit = credit ? credit : null;
     view = "main";
   }
 
@@ -162,7 +164,7 @@
         <div class="column is-one-third is-size-4">Choose an example from our gallery</div>
         <div class="column">
             {#each examples as example}
-              <button class="button is-primary has-text-weight-bold mr-4 mb-1" on:click={()=>{enterMap(example.image, example.width)}}>{example.label}</button>
+              <button class="button is-primary has-text-weight-bold mr-4 mb-1" on:click={()=>{enterMap(example.image, example.width, example.credit)}}>{example.label}</button>
             {/each}
         </div>
       </div>
@@ -225,7 +227,7 @@
       <a class="button is-small is-link is-outlined" href="https://leventhalmap.org/donate">💌 Support free programs at LMEC</a>
     </p>
     <a href="https://leventhalmap.org"><img src="https://s3.us-east-2.wasabisys.com/lmec-public-files/images/MapCenter-small.png" alt="LMEC Logo" class="footer-logo"></a>
-    <p class="is-size-7"><a href="https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9">Map imagery source</a>: Esri, Maxar, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AeroGRID, IGN, and the GIS User Community</p>
+    <p class="is-size-7"><a href="https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9">Map base imagery source</a>: Esri, Maxar, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AeroGRID, IGN, and the GIS User Community</p>
   </footer>
 
 

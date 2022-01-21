@@ -269,5 +269,11 @@ onMount(() => {
             </div>
         </div>
     </div>
+    
+    {#if mapVars.credit != null }
+    <div class="notification is-secondary is-light my-3">
+        <strong>This example is thanks to</strong>: {@html mapVars.credit}
+    </div>
+    {/if}
 
 </div>
