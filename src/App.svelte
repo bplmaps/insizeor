@@ -19,8 +19,8 @@
     {label: "BPL McKim Building", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/mckim.png", width: 72},
     {label: "Fenway Park", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/fenway.png", width: 235},
     {label: "Rhode Island", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/ri.png", width: 60000},
-    {label: "2022 Hunga Tonga eruption", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/tonga-eruption.png", width: 450000, credit: "<a href=\"https://twitter.com/WxNB_\">Nahel.B on Twitter</a>"}
-
+    {label: "2022 Hunga Tonga eruption", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/tonga-eruption.png", width: 450000, credit: "<a href=\"https://twitter.com/WxNB_\">Nahel.B on Twitter</a>"},
+    {label: "Beijing National Stadium", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/birdsnest.png", width: 582}
   ];
 
   function checkImageUrl() {
