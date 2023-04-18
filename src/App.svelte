@@ -4,6 +4,7 @@
 
   import MapView from './MapView.svelte';
   import MapClip from './MapClip.svelte';
+  import { onMount } from 'svelte';
 
   let view = "splash";
   let inputImage;
@@ -14,14 +15,18 @@
   let measurementUnit = "meters";
   let inputWidthDimension;
 
-  let examples = [
+  const examples = [
     {label: "Evergiven Ship", image: "https://cdn.glitch.com/40d83f73-34cc-401e-90f3-d6b2f92f2b01%2Fevergiven.png?v=1616949352560", width: 400},
     {label: "BPL McKim Building", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/mckim.png", width: 72},
     {label: "Fenway Park", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/fenway.png", width: 235},
     {label: "Rhode Island", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/ri.png", width: 60000},
     {label: "2022 Hunga Tonga eruption", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/tonga-eruption.png", width: 450000, credit: "<a href=\"https://twitter.com/WxNB_\">Nahel.B on Twitter</a>"},
-    {label: "Beijing National Stadium", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/birdsnest.png", width: 582}
+    {label: "Beijing National Stadium", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/birdsnest.png", width: 582},
+    {id: "cluny", label: "Abbey of Cluny", image: "https://s3.us-east-2.wasabisys.com/lmec-public-files/insizeor-examples/cluny.png", width: 187, credit: "<a href=\"https://candidature-patrimoine-mondial.sitesclunisiens.org\">Sites Clunisiens Candidature Patrimoine Mondial</a>", hidden: true}
+
   ];
+
+  let mapInstructionMessagePopup = true;
 
   function checkImageUrl() {
     if(!inputImage || inputImage.length < 7 || inputImage.slice(0,8) != "https://") {
@@ -63,6 +68,17 @@
     mapVars.credit = credit ? credit : null;
     view = "main";
   }
+
+  onMount(()=>{ 
+    const urlParams = new URLSearchParams(window.location.search);
+    if(urlParams.has('goto')) {
+      const chosen = examples.find(d=>d.id === urlParams.get('goto'))
+      if(chosen) {
+        enterMap(chosen.image, chosen.width, chosen.credit)
+      }
+
+    }
+  });
 
 </script>
 
@@ -117,6 +133,15 @@
     width: 200px;
     height: auto;
   }
+
+  #floating-message {
+    position: absolute;
+    top: 10px;
+  }
+
+  .message {
+    box-shadow: 3px 3px 5px #333;
+  }
   
 </style>
 
@@ -163,7 +188,7 @@
       <div class="columns is-vcentered column-bumper column-bumper-b mt-3">
         <div class="column is-one-third is-size-4">Choose an example from our gallery</div>
         <div class="column">
-            {#each examples as example}
+            {#each examples.filter(d=>!d.hidden) as example}
               <button class="button is-primary has-text-weight-bold mr-4 mb-1" on:click={()=>{enterMap(example.image, example.width, example.credit)}}>{example.label}</button>
             {/each}
         </div>
@@ -215,11 +240,31 @@
   
 
   {:else if view==="main" }
+
+  
   <section id="main">
-    <div class="notification is-success is-light">
-      <p class="has-text-weight-bold">Here's your image dropped down on top of Boston Common. Grab and move the map, or type in the search bar to move elsewhere. You can use the rotate buttons to adjust the positioning of the scaled image.</p></div>
+  
     <MapView bind:mapVars={mapVars} on:startOver={startOver} />
   </section>
+
+  {#if mapInstructionMessagePopup}
+  <div id="floating-message">
+    <div class="container is-fluid">
+      <article class="message is-success is-large">
+        <div class="message-header">
+          <p>Start comparing</p>
+          <button class="delete" aria-label="delete" on:click={()=>{mapInstructionMessagePopup = false}}></button>
+        </div>
+        <div class="message-body">
+          Here's your image dropped down on top of Boston Common. Grab and drag the map, or type in the search bar to jump to another location. You can use the rotate buttons to adjust the positioning of the scaled image.
+        </div>
+      </article>
+    </div>
+
+  </div>
+  {/if}
+
+
   {/if}
 
   <footer>
